@@ -13,11 +13,11 @@ function TaskList ({ tasks, onToggle, onDelete }) {
             task_alt
           </span>
           <h3 className="text-xl font-semibold tracking-tight text-on-surface">
-            Active Tasks
+            Tâches actives
           </h3>
         </div>
         <span className="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">
-          {tasks.length} Pending
+          {tasks.length} En attente
         </span>
       </div>
       <div className="grid gap-4">

@@ -4,6 +4,7 @@
 
 import React, { useState } from "react";
 import TaskList from "../components/TaskList";
+import AddTaskForm from "../components/AddTaskForm";
 
 // Données de test pour les tâches initiales
 const initialTasks = [
@@ -30,14 +31,24 @@ const initialTasks = [
   },
 ];
 
+function createTask({ title, priority }) {
+  return {
+    id: crypto.randomUUID(),
+    title,
+    description: "",
+    priority,
+    completed: false,
+  };
+}
+
 export default function Home() {
   // State local des tâches
   const [tasks, setTasks] = useState(initialTasks);
 
   // Handler pour basculer l'état 'completed' d'une tâche
   const handleToggle = (taskId) => {
-    setTasks((prev) =>
-      prev.map((task) =>
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
         task.id === taskId ? { ...task, completed: !task.completed } : task
       )
     );
@@ -45,7 +56,13 @@ export default function Home() {
 
   // Handler pour supprimer une tâche du tableau
   const handleDelete = (taskId) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId));
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  };
+  
+  // Handler pour ajouter une tâche au tableau
+  const handleAddTask = (newTaskData) => {
+    const newTask = createTask(newTaskData);
+    setTasks((prevTasks) => [newTask, ...prevTasks]);
   };
 
   return (
@@ -53,6 +70,7 @@ export default function Home() {
       <section className="flex flex-col w-full max-w-5xl items-center justify-center gap-8 dark:bg-zinc-900 px-8 py-16 rounded-2xl">
         <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">TaskManager</h1>
         <p className="text-lg text-zinc-600 dark:text-zinc-300">Gérez vos tâches efficacement</p>
+        <AddTaskForm onAddTask={handleAddTask} />
         {/* Affichage du composant TaskList avec les handlers et tasks */}
         <TaskList tasks={tasks} onToggle={handleToggle} onDelete={handleDelete} />
         <button
