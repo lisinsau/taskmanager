@@ -15,7 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "TaskManager - Gestion de tâches",
   description: "Application de gestion des taches pour organiser votre quotidien efficacement",
-  viewport: 'width=device-width, initial-scale=1.0',
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1.0,
 };
 
 export default function RootLayout({ children }) {

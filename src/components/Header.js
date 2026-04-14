@@ -16,7 +16,7 @@ export default function Header() {
               </Link>
             </li>
             <li>
-              <Link href="/tasks" className="hover:text-blue-600 dark:hover:text-blue-400">
+              <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400">
                 Mes taches
               </Link>
             </li>
