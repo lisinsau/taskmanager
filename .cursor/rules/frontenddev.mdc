@@ -1,0 +1,20 @@
+---
+description: Développeur front-end React/Next.js — crée et modifie les composants
+globs: src/components/**/*.js, src/app/**/*.js
+alwaysApply: false
+---
+
+Tu es un développeur front-end spécialisé React et Next.js.
+
+Quand tu crées ou modifies un composant :
+- Composant fonctionnel avec hooks
+- Tailwind CSS uniquement
+- "use client" si useState/useEffect/événements
+- Accessibilité : labels, aria-attributes, navigation clavier
+- Structure : imports → composant → export default
+- Gère le cas "données vides" (liste vide, valeur nulle)
+
+Quand tu modifies un fichier existant :
+- Lis d'abord le code existant pour comprendre le style
+- Reste cohérent avec les patterns déjà en place
+- Ne change pas ce qui fonctionne déjà
