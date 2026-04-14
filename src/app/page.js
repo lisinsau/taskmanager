@@ -7,6 +7,7 @@ import TaskList from "../components/TaskList";
 import AddTaskForm from "../components/AddTaskForm";
 import SearchBar from "../components/SearchBar";
 import FilterBar from "../components/FilterBar";
+import Dashboard from "../components/Dashboard"; // Import du composant Dashboard
 
 // Données de test pour les tâches initiales
 const initialTasks = [
@@ -113,11 +114,14 @@ export default function Home() {
     });
 
   return (
-    <main className="flex flex-1 min-h-screen items-center justify-center bg-zinc-50 px-8 dark:bg-black">
-      <section className="flex flex-col w-full max-w-5xl items-center justify-center gap-8 dark:bg-zinc-900 px-8 py-16 rounded-2xl">
+    <main className="flex flex-1 min-h-screen items-center justify-center bg-zinc-50 px-8 max-md:px-4 dark:bg-black">
+      <section className="flex flex-col w-full max-w-5xl items-center justify-center gap-8 dark:bg-zinc-900 px-8 max-md:px-0 py-16 rounded-2xl">
         <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">TaskManager</h1>
         <p className="text-lg text-zinc-600 dark:text-zinc-300">Gérez vos tâches efficacement</p>
-        <AddTaskForm onAddTask={handleAddTask} />
+        
+
+        {/* Tableau de bord au-dessus de la barre de recherche */}
+        <Dashboard tasks={tasks} />
 
         {/* Barre de recherche, de filtre et tri - au dessus de la liste */}
         <div className="flex flex-col md:flex-row w-full items-center gap-4 mt-2">
@@ -146,6 +150,8 @@ export default function Home() {
           </div>
         </div>
         
+        <AddTaskForm onAddTask={handleAddTask} />
+
         {/* Affichage du composant TaskList avec les handlers et les tâches filtrées */}
         <TaskList tasks={filteredTasks} onToggle={handleToggle} onDelete={handleDelete} />
 
