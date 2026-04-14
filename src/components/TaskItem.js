@@ -84,7 +84,7 @@ function TaskItem({
         </div>
         {description ? (
           <p
-            className={`text-sm text-zinc-500 ${
+            className={`text-sm text-zinc-700 ${
               completed
                 ? "line-through"
                 : "dark:text-zinc-300"
@@ -98,7 +98,7 @@ function TaskItem({
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="cursor-pointer max-h-fit aspect-square delete-btn opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-2 text-zinc-400 hover:text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-full"
+          className="cursor-pointer max-h-fit aspect-square delete-btn opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-2 text-zinc-400 hover:text-red-600 hover:bg-red-100 max-md:opacity-100 dark:hover:bg-red-900/20 rounded-full"
           aria-label="Supprimer la tâche"
           onClick={() => onDelete && onDelete(id)}
         >
