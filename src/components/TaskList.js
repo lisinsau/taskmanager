@@ -3,16 +3,17 @@ import TaskItem from "./TaskItem";
 
 function TaskList ({ tasks, onToggle, onDelete }) {
   return (
-    <section className="space-y-8">
+    <section className="w-full space-y-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span
             className="material-symbols-outlined text-primary"
+            aria-hidden="true"
             style={{ fontVariationSettings: "'FILL' 1" }}
           >
             task_alt
           </span>
-          <h2 className="text-xl font-semibold tracking-tight text-on-surface">
+          <h2 className="text-2xl font-semibold tracking-tight text-on-surface">
             Liste de tâches
           </h2>
         </div>

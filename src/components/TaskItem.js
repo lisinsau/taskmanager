@@ -32,7 +32,7 @@ function TaskItem({
 
   return (
     <div
-      className={`task-card group relative ${completed ? "bg-blue-50 dark:bg-zinc-800" : "bg-white dark:bg-zinc-800"} p-6 rounded-lg flex items-center gap-6 transition-all duration-300 hover:shadow-[0_12px_32px_-4px_rgba(19,27,46,0.08)]`}
+      className={`task-card group relative ${completed ? "bg-blue-50 dark:bg-zinc-800" : "bg-white dark:bg-zinc-800"} p-6 rounded-lg flex items-center gap-6 max-md:gap-3 transition-all duration-300 hover:shadow-[0_12px_32px_-4px_rgba(19,27,46,0.08)]`}
     >
       <div
         className={`absolute left-0 top-1/4 bottom-1/4 w-1 ${data.accentBar} rounded-r-full`}
