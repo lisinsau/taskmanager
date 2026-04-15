@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Header from "../../components/Header";
 import AuthGuard from "../../components/AuthGuard";
 import CreateListForm from "../../components/CreateListForm";
 import SharedListCard from "../../components/SharedListCard";
@@ -118,7 +119,14 @@ export default function SharedListsPage() {
             [list.id]: { totalTasks, completedTasks },
           }));
         },
-        () => {}
+        (subscriptionError) => {
+          setError(
+            getErrorMessage(
+              subscriptionError,
+              "Impossible de charger les statistiques des tâches partagées."
+            )
+          );
+        }
       )
     );
 
@@ -318,6 +326,7 @@ export default function SharedListsPage() {
 
   return (
     <AuthGuard>
+      <Header />
       <main className="flex min-h-screen justify-center bg-zinc-50 px-4 py-10">
         <section className="w-full max-w-5xl space-y-6">
           <header className="space-y-2">

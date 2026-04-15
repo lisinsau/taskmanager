@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function SignupForm() {
-  const { signUp, error: authError } = useAuth();
+  const { user, loading: authLoading, signUp, error: authError } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,6 +16,12 @@ export default function SignupForm() {
 
   const errorMessage = localError || authError;
   const hasError = Boolean(errorMessage);
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace("/");
+    }
+  }, [authLoading, user, router]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -43,6 +49,7 @@ export default function SignupForm() {
     <section className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
       {hasError ? (
         <p
+          id="signup-form-error"
           role="alert"
           className="mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700"
         >
@@ -66,6 +73,7 @@ export default function SignupForm() {
             placeholder="vous@exemple.com"
             className="rounded-lg border border-zinc-300 px-4 py-2 text-zinc-900 placeholder:text-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             aria-invalid={hasError}
+            aria-describedby={hasError ? "signup-form-error" : undefined}
             autoComplete="email"
             required
           />
@@ -86,6 +94,7 @@ export default function SignupForm() {
             placeholder="Créez un mot de passe"
             className="rounded-lg border border-zinc-300 px-4 py-2 text-zinc-900 placeholder:text-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             aria-invalid={hasError}
+            aria-describedby={hasError ? "signup-form-error" : undefined}
             autoComplete="new-password"
             required
           />
@@ -106,6 +115,7 @@ export default function SignupForm() {
             placeholder="Confirmez votre mot de passe"
             className="rounded-lg border border-zinc-300 px-4 py-2 text-zinc-900 placeholder:text-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             aria-invalid={hasError}
+            aria-describedby={hasError ? "signup-form-error" : undefined}
             autoComplete="new-password"
             required
           />
@@ -124,6 +134,7 @@ export default function SignupForm() {
         Déjà un compte ?{" "}
         <Link
           href="/login"
+          prefetch={false}
           className="font-semibold text-blue-600 hover:text-blue-700 hover:underline"
         >
           Se connecter

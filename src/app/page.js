@@ -3,6 +3,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Header from "../components/Header";
 import TaskList from "../components/TaskList";
 import AddTaskForm from "../components/AddTaskForm";
 import SearchBar from "../components/SearchBar";
@@ -172,6 +173,7 @@ export default function Home() {
 
   return (
     <AuthGuard>
+      <Header />
       <main className="flex flex-1 min-h-screen items-center justify-center bg-zinc-50 px-8 max-md:px-4 dark:bg-black">
         <section className="flex flex-col w-full max-w-5xl items-center justify-center gap-8 dark:bg-zinc-900 px-8 max-md:px-0 py-16 rounded-2xl">
           <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">TaskManager</h1>

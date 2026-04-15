@@ -33,6 +33,7 @@ export default function Header() {
             <li>
               <Link
                 href="/shared"
+                prefetch={false}
                 className={getLinkClassName(isSharedPage)}
                 aria-current={isSharedPage ? "page" : undefined}
               >
