@@ -39,6 +39,7 @@ export default function CreateListForm({ onCreateList }) {
         value={name}
         onChange={(event) => setName(event.target.value)}
         placeholder="Nom de la liste"
+        maxLength="150"
         className="flex-1 rounded-lg border border-zinc-300 px-4 py-2"
         aria-invalid={Boolean(error)}
         aria-describedby={error ? "create-list-error" : undefined}

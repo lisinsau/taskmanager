@@ -174,6 +174,7 @@ export default function SharedListView({
                 onToggle={() =>
                   onUpdateTask?.(task.id, { completed: !Boolean(task.completed) })
                 }
+                onEdit={(_, edits) => onUpdateTask?.(task.id, edits)}
                 onDelete={() => onDeleteTask?.(task.id)}
               />
             ))

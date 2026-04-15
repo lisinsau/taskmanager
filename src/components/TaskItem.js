@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import TaskEditForm from "./TaskEditForm";
 
 const PRIORITY_DATA = {
   haute: {
@@ -26,10 +27,36 @@ function TaskItem({
   priority,
   completed,
   onToggle,
+  onEdit,
   onDelete,
 }) {
+  const [isEditing, setIsEditing] = useState(false);
   
   const data = PRIORITY_DATA[priority] || PRIORITY_DATA.basse;
+
+  const handleSaveEdit = (edits) => {
+    onEdit?.(id, edits);
+    setIsEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  if (isEditing) {
+    return (
+      <div
+        className={`task-card relative ${completed ? "bg-blue-50 dark:bg-zinc-800" : "bg-white dark:bg-zinc-800"} p-6 rounded-lg max-md:gap-3 transition-all duration-300`}
+      >
+        <TaskEditForm
+          title={title}
+          priority={priority}
+          onSave={handleSaveEdit}
+          onCancel={handleCancelEdit}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -102,9 +129,21 @@ function TaskItem({
       <div className="flex items-center gap-2">
         <button
           type="button"
+          className="cursor-pointer max-h-fit aspect-square opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-2 text-zinc-400 hover:text-blue-600 hover:bg-blue-100 max-md:opacity-100 dark:hover:bg-blue-900/20 rounded-full"
+          aria-label="Modifier la tâche"
+          onClick={() => setIsEditing(true)}
+        >
+          <span className="material-symbols-outlined">edit</span>
+        </button>
+        <button
+          type="button"
           className="cursor-pointer max-h-fit aspect-square delete-btn opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-2 text-zinc-400 hover:text-red-600 hover:bg-red-100 max-md:opacity-100 dark:hover:bg-red-900/20 rounded-full"
           aria-label="Supprimer la tâche"
-          onClick={() => onDelete && onDelete(id)}
+          onClick={() => {
+            if (window.confirm("Supprimer cette tâche ?")) {
+              onDelete(id);
+            }
+          }}
         >
           <span className="material-symbols-outlined">delete</span>
         </button>

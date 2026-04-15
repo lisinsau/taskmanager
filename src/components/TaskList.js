@@ -1,7 +1,7 @@
 import React from "react";
 import TaskItem from "./TaskItem";
 
-function TaskList ({ tasks, onToggle, onDelete }) {
+function TaskList ({ tasks, onToggle, onEdit, onDelete }) {
   return (
     <section className="w-full space-y-8">
       <div className="flex items-center justify-between">
@@ -38,6 +38,7 @@ function TaskList ({ tasks, onToggle, onDelete }) {
               priority={task.priority}
               completed={task.completed}
               onToggle={() => onToggle(task.id)}
+              onEdit={onEdit}
               onDelete={() => onDelete(task.id)}
             />
           ))

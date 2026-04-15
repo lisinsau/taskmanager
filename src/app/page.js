@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Header from "../components/Header";
 import TaskList from "../components/TaskList";
 import AddTaskForm from "../components/AddTaskForm";
@@ -139,6 +139,20 @@ export default function Home() {
     }
   };
 
+  const handleEditTask = async (taskId, edits) => {
+    if (!userId) {
+      return;
+    }
+
+    setError(null);
+    try {
+      // edits est un objet contenant { title, priority }
+      await updateTask(userId, taskId, edits);
+    } catch (updateError) {
+      setError(getErrorMessage(updateError, "Impossible de modifier la tâche."));
+    }
+  };
+
   // Handler pour changer la recherche
   const handleSearchChange = (query) => setSearchQuery(query);
 
@@ -149,27 +163,29 @@ export default function Home() {
   const handleSortChange = (e) => setSortOrder(e.target.value);
 
   // Filtrage des tâches selon la recherche, le filtre et le tri
-  const filteredTasks = tasks
-    .filter((task) =>
-      task.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
-    )
-    .filter((task) => {
-      if (filter === "actives") return !task.completed;
-      if (filter === "complétées") return task.completed;
-      return true; // "toutes"
-    })
-    .sort((a, b) => {
-      if (sortOrder === "priority") {
-        // Ordonner par priorité ascendante ("haute" < "moyenne" < "basse")
-        const priorityA = PRIORITY_ORDER[a.priority] ?? Number.MAX_SAFE_INTEGER;
-        const priorityB = PRIORITY_ORDER[b.priority] ?? Number.MAX_SAFE_INTEGER;
-        return priorityA - priorityB;
-      } else if (sortOrder === "date") {
-        // Ordonner par date de création croissante (plus récent d'abord)
-        return getCreatedAtMs(b.createdAt) - getCreatedAtMs(a.createdAt);
-      }
-      return 0;
-    });
+  const filteredTasks = useMemo(() => {
+    return tasks
+      .filter((task) =>
+        task.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
+      )
+      .filter((task) => {
+        if (filter === "actives") return !task.completed;
+        if (filter === "complétées") return task.completed;
+        return true; // "toutes"
+      })
+      .sort((a, b) => {
+        if (sortOrder === "priority") {
+          // Ordonner par priorité ascendante ("haute" < "moyenne" < "basse")
+          const priorityA = PRIORITY_ORDER[a.priority] ?? Number.MAX_SAFE_INTEGER;
+          const priorityB = PRIORITY_ORDER[b.priority] ?? Number.MAX_SAFE_INTEGER;
+          return priorityA - priorityB;
+        } else if (sortOrder === "date") {
+          // Ordonner par date de création croissante (plus récent d'abord)
+          return getCreatedAtMs(b.createdAt) - getCreatedAtMs(a.createdAt);
+        }
+        return 0;
+      });
+  }, [tasks, searchQuery, filter, sortOrder]);
 
   return (
     <AuthGuard>
@@ -229,6 +245,7 @@ export default function Home() {
             <TaskList
               tasks={filteredTasks}
               onToggle={handleToggle}
+              onEdit={handleEditTask}
               onDelete={handleDelete}
             />
           ) : null}

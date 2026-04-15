@@ -32,8 +32,10 @@ export default function AddTaskForm({ onAddTask }) {
         placeholder="Titre de la tâche"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        maxLength="150"
         className="flex-1 rounded-lg border px-4 py-2"
         required
+        aria-required="true"
       />
       <label htmlFor="task-priority" className="sr-only">
         Priorité de la tâche
