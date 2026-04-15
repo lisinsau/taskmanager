@@ -14,7 +14,7 @@ function TaskList ({ tasks, onToggle, onDelete }) {
             task_alt
           </span>
           <h2 className="text-2xl font-semibold tracking-tight text-on-surface">
-            Liste de tâches
+            Mes tâches
           </h2>
         </div>
         <span className="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase">

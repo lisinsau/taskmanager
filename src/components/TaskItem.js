@@ -22,6 +22,7 @@ function TaskItem({
   id,
   title,
   description,
+  metaText,
   priority,
   completed,
   onToggle,
@@ -92,6 +93,9 @@ function TaskItem({
           >
             {description}
           </p>
+        ) : null}
+        {metaText ? (
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{metaText}</p>
         ) : null}
       </div>
 
