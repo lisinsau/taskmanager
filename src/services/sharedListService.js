@@ -18,6 +18,23 @@ import {
 
 import { db } from "../lib/firebase";
 
+const FIRESTORE_ERROR_MESSAGES = {
+  "permission-denied":
+    "Accès refusé. Vous n'avez pas la permission d'effectuer cette action.",
+  "not-found": "Cette ressource n'existe plus.",
+  unavailable: "Service temporairement indisponible. Vérifiez votre connexion.",
+  unauthenticated: "Vous devez être connecté pour effectuer cette action.",
+};
+
+function toUserError(error, fallbackMessage = "Une erreur est survenue. Veuillez réessayer.") {
+  if (error instanceof Error && !error?.code) {
+    return error;
+  }
+
+  const message = FIRESTORE_ERROR_MESSAGES[error?.code] || fallbackMessage;
+  return new Error(message);
+}
+
 function getSharedListsCollection() {
   return collection(db, "sharedLists");
 }
@@ -54,7 +71,7 @@ export async function createSharedList(userId, name) {
     const listRef = await addDoc(getSharedListsCollection(), listPayload);
     return listRef.id;
   } catch (error) {
-    throw new Error("Impossible de créer la liste partagée.");
+    throw toUserError(error);
   }
 }
 
@@ -77,7 +94,7 @@ export async function getUserSharedLists(userId) {
       };
     });
   } catch (error) {
-    throw new Error("Impossible de récupérer les listes partagées.");
+    throw toUserError(error);
   }
 }
 
@@ -106,14 +123,14 @@ export function subscribeToSharedLists(userId, callback, onError) {
       },
       (error) => {
         if (onError) {
-          onError(error);
+          onError(toUserError(error));
         }
       }
     );
 
     return unsubscribe;
   } catch (error) {
-    throw new Error("Impossible d'écouter les listes partagées.");
+    throw toUserError(error);
   }
 }
 
@@ -149,10 +166,7 @@ export async function addMemberToList(listId, email) {
       members: arrayUnion(memberId),
     });
   } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error("Impossible d'ajouter ce membre à la liste.");
+    throw toUserError(error);
   }
 }
 
@@ -188,7 +202,7 @@ export async function getUsersByIds(userIds) {
 
     return users;
   } catch (error) {
-    throw new Error("Impossible de récupérer les informations des membres.");
+    throw toUserError(error);
   }
 }
 
@@ -218,10 +232,7 @@ export async function removeMemberFromList(listId, currentUserId, memberIdToRemo
       members: arrayRemove(memberIdToRemove),
     });
   } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error("Impossible de retirer ce membre.");
+    throw toUserError(error);
   }
 }
 
@@ -243,10 +254,7 @@ export async function deleteSharedList(listId, userId) {
     await Promise.all(tasksSnapshot.docs.map((taskDoc) => deleteDoc(taskDoc.ref)));
     await deleteDoc(listRef);
   } catch (error) {
-    if (error instanceof Error) {
-      throw error;
-    }
-    throw new Error("Impossible de supprimer la liste partagée.");
+    throw toUserError(error);
   }
 }
 
@@ -257,7 +265,7 @@ export async function getSharedListTasks(listId) {
 
     return snapshot.docs.map(normalizeTask);
   } catch (error) {
-    throw new Error("Impossible de récupérer les tâches partagées.");
+    throw toUserError(error);
   }
 }
 
@@ -274,7 +282,7 @@ export async function addSharedTask(listId, userId, task) {
     const taskRef = await addDoc(getSharedTasksCollection(listId), payload);
     return taskRef.id;
   } catch (error) {
-    throw new Error("Impossible d'ajouter la tâche partagée.");
+    throw toUserError(error);
   }
 }
 
@@ -283,7 +291,7 @@ export async function updateSharedTask(listId, taskId, updates) {
     const taskRef = doc(db, "sharedLists", listId, "tasks", taskId);
     await updateDoc(taskRef, updates);
   } catch (error) {
-    throw new Error("Impossible de mettre à jour la tâche partagée.");
+    throw toUserError(error);
   }
 }
 
@@ -292,7 +300,7 @@ export async function deleteSharedTask(listId, taskId) {
     const taskRef = doc(db, "sharedLists", listId, "tasks", taskId);
     await deleteDoc(taskRef);
   } catch (error) {
-    throw new Error("Impossible de supprimer la tâche partagée.");
+    throw toUserError(error);
   }
 }
 
@@ -308,13 +316,13 @@ export function subscribeToSharedTasks(listId, callback, onError) {
       },
       (error) => {
         if (onError) {
-          onError(error);
+          onError(toUserError(error));
         }
       }
     );
 
     return unsubscribe;
   } catch (error) {
-    throw new Error("Impossible d'écouter les tâches partagées.");
+    throw toUserError(error);
   }
 }

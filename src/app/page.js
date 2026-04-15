@@ -21,6 +21,14 @@ import {
 // Map pour ordonner par priorité ascendante (haute < moyenne < basse)
 const PRIORITY_ORDER = { "haute": 0, "moyenne": 1, "basse": 2 };
 
+function getErrorMessage(error, fallbackMessage) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallbackMessage;
+}
+
 function getCreatedAtMs(createdAt) {
   if (!createdAt) {
     return 0;
@@ -73,8 +81,10 @@ export default function Home() {
         setTasks(nextTasks);
         setLoading(false);
       },
-      () => {
-        setError("Impossible de charger les tâches en temps réel.");
+      (subscriptionError) => {
+        setError(
+          getErrorMessage(subscriptionError, "Impossible de charger les tâches en temps réel.")
+        );
         setLoading(false);
       }
     );
@@ -96,7 +106,7 @@ export default function Home() {
     try {
       await updateTask(userId, taskId, { completed: !targetTask.completed });
     } catch (updateError) {
-      setError(updateError.message || "Impossible de mettre à jour la tâche.");
+      setError(getErrorMessage(updateError, "Impossible de mettre à jour la tâche."));
     }
   };
 
@@ -110,7 +120,7 @@ export default function Home() {
     try {
       await deleteTask(userId, taskId);
     } catch (deleteError) {
-      setError(deleteError.message || "Impossible de supprimer la tâche.");
+      setError(getErrorMessage(deleteError, "Impossible de supprimer la tâche."));
     }
   };
   
@@ -124,7 +134,7 @@ export default function Home() {
     try {
       await addTask(userId, newTaskData);
     } catch (addError) {
-      setError(addError.message || "Impossible d'ajouter la tâche.");
+      setError(getErrorMessage(addError, "Impossible d'ajouter la tâche."));
     }
   };
 

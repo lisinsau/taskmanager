@@ -19,6 +19,14 @@ import {
   updateSharedTask,
 } from "../../services/sharedListService";
 
+function getErrorMessage(error, fallbackMessage) {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallbackMessage;
+}
+
 export default function SharedListsPage() {
   const { user } = useAuth();
   const userId = user?.uid || null;
@@ -54,8 +62,10 @@ export default function SharedListsPage() {
         setLists(nextLists);
         setLoadingLists(false);
       },
-      () => {
-        setError("Impossible de charger les listes partagées.");
+      (subscriptionError) => {
+        setError(
+          getErrorMessage(subscriptionError, "Impossible de charger les listes partagées.")
+        );
         setLoadingLists(false);
       }
     );
@@ -79,8 +89,10 @@ export default function SharedListsPage() {
         setSelectedTasks(tasks);
         setLoadingTasks(false);
       },
-      () => {
-        setError("Impossible de charger les tâches partagées.");
+      (subscriptionError) => {
+        setError(
+          getErrorMessage(subscriptionError, "Impossible de charger les tâches partagées.")
+        );
         setLoadingTasks(false);
       }
     );
@@ -214,7 +226,7 @@ export default function SharedListsPage() {
     try {
       await createSharedList(userId, name);
     } catch (createError) {
-      setError(createError.message || "Impossible de créer la liste partagée.");
+      setError(getErrorMessage(createError, "Impossible de créer la liste partagée."));
       throw createError;
     }
   };
@@ -235,7 +247,7 @@ export default function SharedListsPage() {
         setSelectedListId(null);
       }
     } catch (deleteError) {
-      setError(deleteError.message || "Impossible de supprimer la liste.");
+      setError(getErrorMessage(deleteError, "Impossible de supprimer la liste."));
     }
   };
 
@@ -248,7 +260,7 @@ export default function SharedListsPage() {
     try {
       await addMemberToList(selectedListId, email);
     } catch (memberError) {
-      setError(memberError.message || "Impossible d'ajouter ce membre.");
+      setError(getErrorMessage(memberError, "Impossible d'ajouter ce membre."));
     }
   };
 
@@ -261,7 +273,7 @@ export default function SharedListsPage() {
     try {
       await removeMemberFromList(selectedListId, userId, memberId);
     } catch (memberError) {
-      setError(memberError.message || "Impossible de retirer ce membre.");
+      setError(getErrorMessage(memberError, "Impossible de retirer ce membre."));
     }
   };
 
@@ -274,7 +286,7 @@ export default function SharedListsPage() {
     try {
       await addSharedTask(selectedListId, userId, task);
     } catch (taskError) {
-      setError(taskError.message || "Impossible d'ajouter la tâche partagée.");
+      setError(getErrorMessage(taskError, "Impossible d'ajouter la tâche partagée."));
     }
   };
 
@@ -287,7 +299,7 @@ export default function SharedListsPage() {
     try {
       await updateSharedTask(selectedListId, taskId, updates);
     } catch (taskError) {
-      setError(taskError.message || "Impossible de mettre à jour la tâche.");
+      setError(getErrorMessage(taskError, "Impossible de mettre à jour la tâche."));
     }
   };
 
@@ -300,7 +312,7 @@ export default function SharedListsPage() {
     try {
       await deleteSharedTask(selectedListId, taskId);
     } catch (taskError) {
-      setError(taskError.message || "Impossible de supprimer la tâche.");
+      setError(getErrorMessage(taskError, "Impossible de supprimer la tâche."));
     }
   };
 
