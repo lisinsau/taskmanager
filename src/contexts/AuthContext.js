@@ -9,8 +9,9 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut,
 } from "firebase/auth";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
-import { auth } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
 
 export const AuthContext = createContext(null);
 
@@ -49,11 +50,35 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const ensureUserDocument = async (firebaseUser) => {
+    if (!firebaseUser?.uid) {
+      return;
+    }
+
+    const email = firebaseUser.email || "";
+    await setDoc(
+      doc(db, "users", firebaseUser.uid),
+      {
+        email,
+        emailLowercase: email.toLowerCase(),
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  };
+
   useEffect(() => {
     // Écoute en temps réel des changements d'authentification Firebase.
     const unsubscribe = onAuthStateChanged(
       auth,
-      (currentUser) => {
+      async (currentUser) => {
+        try {
+          if (currentUser) {
+            await ensureUserDocument(currentUser);
+          }
+        } catch {
+          // On ignore ici pour ne pas bloquer la session utilisateur.
+        }
         setUser(currentUser);
         setLoading(false);
       },
