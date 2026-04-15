@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
-export default function UserMenu() {
+export default function UserMenu({ compact = false }) {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const [error, setError] = useState(null);
@@ -28,6 +28,24 @@ export default function UserMenu() {
 
   if (!user) {
     return null;
+  }
+
+  if (compact) {
+    return (
+      <div className="flex items-center gap-3">
+        <p className="max-w-40 truncate text-sm text-zinc-700" title={user.email || ""}>
+          {user.email}
+        </p>
+        <button
+          type="button"
+          onClick={handleSignOut}
+          disabled={loading}
+          className="rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loading ? "..." : "Se déconnecter"}
+        </button>
+      </div>
+    );
   }
 
   return (

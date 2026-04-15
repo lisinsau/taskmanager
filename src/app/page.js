@@ -166,7 +166,6 @@ export default function Home() {
         <section className="flex flex-col w-full max-w-5xl items-center justify-center gap-8 dark:bg-zinc-900 px-8 max-md:px-0 py-16 rounded-2xl">
           <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">TaskManager</h1>
           <p className="text-lg text-zinc-600 dark:text-zinc-300">Gérez vos tâches efficacement</p>
-          <UserMenu />
 
           {/* Tableau de bord au-dessus de la barre de recherche */}
           <Dashboard tasks={tasks} />
@@ -221,13 +220,7 @@ export default function Home() {
               onDelete={handleDelete}
             />
           ) : null}
-
-          <button
-            className="mt-4 px-8 py-3 rounded-full bg-blue-600 text-white text-base font-semibold text-center hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            aria-label="Commencer avec TaskManager"
-          >
-            Commencer
-          </button>
+          
         </section>
       </main>
     </AuthGuard>
