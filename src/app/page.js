@@ -8,6 +8,8 @@ import AddTaskForm from "../components/AddTaskForm";
 import SearchBar from "../components/SearchBar";
 import FilterBar from "../components/FilterBar";
 import Dashboard from "../components/Dashboard"; // Import du composant Dashboard
+import UserMenu from "../components/UserMenu";
+import AuthGuard from "../components/AuthGuard";
 
 // Données de test pour les tâches initiales
 const initialTasks = [
@@ -114,54 +116,56 @@ export default function Home() {
     });
 
   return (
-    <main className="flex flex-1 min-h-screen items-center justify-center bg-zinc-50 px-8 max-md:px-4 dark:bg-black">
-      <section className="flex flex-col w-full max-w-5xl items-center justify-center gap-8 dark:bg-zinc-900 px-8 max-md:px-0 py-16 rounded-2xl">
-        <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">TaskManager</h1>
-        <p className="text-lg text-zinc-600 dark:text-zinc-300">Gérez vos tâches efficacement</p>
-        
+    <AuthGuard>
+      <main className="flex flex-1 min-h-screen items-center justify-center bg-zinc-50 px-8 max-md:px-4 dark:bg-black">
+        <section className="flex flex-col w-full max-w-5xl items-center justify-center gap-8 dark:bg-zinc-900 px-8 max-md:px-0 py-16 rounded-2xl">
+          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">TaskManager</h1>
+          <p className="text-lg text-zinc-600 dark:text-zinc-300">Gérez vos tâches efficacement</p>
+          <UserMenu />
 
-        {/* Tableau de bord au-dessus de la barre de recherche */}
-        <Dashboard tasks={tasks} />
+          {/* Tableau de bord au-dessus de la barre de recherche */}
+          <Dashboard tasks={tasks} />
 
-        {/* Barre de recherche, de filtre et tri - au dessus de la liste */}
-        <div className="flex flex-col md:flex-row w-full items-center gap-4 mt-2">
-          <div className="w-full md:w-2/4">
-            {/* Barre de recherche */}
-            <SearchBar value={searchQuery} onChange={handleSearchChange} />
+          {/* Barre de recherche, de filtre et tri - au dessus de la liste */}
+          <div className="flex flex-col md:flex-row w-full items-center gap-4 mt-2">
+            <div className="w-full md:w-2/4">
+              {/* Barre de recherche */}
+              <SearchBar value={searchQuery} onChange={handleSearchChange} />
+            </div>
+            <div className="flex-1 flex flex-col sm:flex-row gap-3 items-center justify-end">
+              {/* Barre de filtre */}
+              <FilterBar currentFilter={filter} onFilterChange={handleFilterChange} />
+
+              {/* Sélecteur de tri */}
+              <label htmlFor="sort-order" className="sr-only">
+                Trier par
+              </label>
+              <select
+                id="sort-order"
+                value={sortOrder}
+                onChange={handleSortChange}
+                className="rounded-lg border px-4 py-2"
+                aria-label="Trier les tâches"
+              >
+                <option value="priority">Priorité</option>
+                <option value="date">Date</option>
+              </select>
+            </div>
           </div>
-          <div className="flex-1 flex flex-col sm:flex-row gap-3 items-center justify-end">
-            {/* Barre de filtre */}
-            <FilterBar currentFilter={filter} onFilterChange={handleFilterChange} />
+          
+          <AddTaskForm onAddTask={handleAddTask} />
 
-            {/* Sélecteur de tri */}
-            <label htmlFor="sort-order" className="sr-only">
-              Trier par
-            </label>
-            <select
-              id="sort-order"
-              value={sortOrder}
-              onChange={handleSortChange}
-              className="rounded-lg border px-4 py-2"
-              aria-label="Trier les tâches"
-            >
-              <option value="priority">Priorité</option>
-              <option value="date">Date</option>
-            </select>
-          </div>
-        </div>
-        
-        <AddTaskForm onAddTask={handleAddTask} />
+          {/* Affichage du composant TaskList avec les handlers et les tâches filtrées */}
+          <TaskList tasks={filteredTasks} onToggle={handleToggle} onDelete={handleDelete} />
 
-        {/* Affichage du composant TaskList avec les handlers et les tâches filtrées */}
-        <TaskList tasks={filteredTasks} onToggle={handleToggle} onDelete={handleDelete} />
-
-        <button
-          className="mt-4 px-8 py-3 rounded-full bg-blue-600 text-white text-base font-semibold text-center hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          aria-label="Commencer avec TaskManager"
-        >
-          Commencer
-        </button>
-      </section>
-    </main>
+          <button
+            className="mt-4 px-8 py-3 rounded-full bg-blue-600 text-white text-base font-semibold text-center hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            aria-label="Commencer avec TaskManager"
+          >
+            Commencer
+          </button>
+        </section>
+      </main>
+    </AuthGuard>
   );
 }
