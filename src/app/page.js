@@ -2,7 +2,7 @@
 
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TaskList from "../components/TaskList";
 import AddTaskForm from "../components/AddTaskForm";
 import SearchBar from "../components/SearchBar";
@@ -10,53 +10,44 @@ import FilterBar from "../components/FilterBar";
 import Dashboard from "../components/Dashboard"; // Import du composant Dashboard
 import UserMenu from "../components/UserMenu";
 import AuthGuard from "../components/AuthGuard";
-
-// Données de test pour les tâches initiales
-const initialTasks = [
-  {
-    id: 1,
-    title: "Préparer la réunion",
-    description: "Créer l'ordre du jour et partager avec l'équipe.",
-    priority: "haute",
-    completed: false,
-    createdAt: new Date(2023, 9, 10, 8, 30).getTime(),
-  },
-  {
-    id: 2,
-    title: "Acheter des fournitures",
-    description: "Cartouches d'encre pour l'imprimante.",
-    priority: "moyenne",
-    completed: false,
-    createdAt: new Date(2023, 9, 9, 15, 0).getTime(),
-  },
-  {
-    id: 3,
-    title: "Lire la documentation",
-    description: "Parcourir la doc Next.js & Tailwind.",
-    priority: "basse",
-    completed: true,
-    createdAt: new Date(2023, 9, 8, 10, 0).getTime(),
-  },
-];
+import { useAuth } from "../contexts/AuthContext";
+import {
+  addTask,
+  deleteTask,
+  subscribeToTasks,
+  updateTask,
+} from "../services/taskService";
 
 // Map pour ordonner par priorité ascendante (haute < moyenne < basse)
 const PRIORITY_ORDER = { "haute": 0, "moyenne": 1, "basse": 2 };
 
-// Fonction utilitaire pour créer une tâche avec une date de création
-function createTask({ title, priority }) {
-  return {
-    id: crypto.randomUUID(),
-    title,
-    description: "",
-    priority,
-    completed: false,
-    createdAt: Date.now(),
-  };
+function getCreatedAtMs(createdAt) {
+  if (!createdAt) {
+    return 0;
+  }
+
+  if (typeof createdAt === "number") {
+    return createdAt;
+  }
+
+  if (createdAt instanceof Date) {
+    return createdAt.getTime();
+  }
+
+  if (typeof createdAt.toMillis === "function") {
+    return createdAt.toMillis();
+  }
+
+  return 0;
 }
 
 export default function Home() {
-  // State local des tâches
-  const [tasks, setTasks] = useState(initialTasks);
+  const { user } = useAuth();
+  const userId = user?.uid || null;
+
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // State pour la recherche
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,23 +57,75 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState("priority");
 
   // Handler pour basculer l'état 'completed' d'une tâche
-  const handleToggle = (taskId) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
+  useEffect(() => {
+    if (!userId) {
+      setTasks([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const unsubscribe = subscribeToTasks(
+      userId,
+      (nextTasks) => {
+        setTasks(nextTasks);
+        setLoading(false);
+      },
+      () => {
+        setError("Impossible de charger les tâches en temps réel.");
+        setLoading(false);
+      }
     );
+
+    return () => unsubscribe();
+  }, [userId]);
+
+  const handleToggle = async (taskId) => {
+    if (!userId) {
+      return;
+    }
+
+    const targetTask = tasks.find((task) => task.id === taskId);
+    if (!targetTask) {
+      return;
+    }
+
+    setError(null);
+    try {
+      await updateTask(userId, taskId, { completed: !targetTask.completed });
+    } catch (updateError) {
+      setError(updateError.message || "Impossible de mettre à jour la tâche.");
+    }
   };
 
   // Handler pour supprimer une tâche du tableau
-  const handleDelete = (taskId) => {
-    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+  const handleDelete = async (taskId) => {
+    if (!userId) {
+      return;
+    }
+
+    setError(null);
+    try {
+      await deleteTask(userId, taskId);
+    } catch (deleteError) {
+      setError(deleteError.message || "Impossible de supprimer la tâche.");
+    }
   };
   
   // Handler pour ajouter une tâche au tableau
-  const handleAddTask = (newTaskData) => {
-    const newTask = createTask(newTaskData);
-    setTasks((prevTasks) => [newTask, ...prevTasks]);
+  const handleAddTask = async (newTaskData) => {
+    if (!userId) {
+      return;
+    }
+
+    setError(null);
+    try {
+      await addTask(userId, newTaskData);
+    } catch (addError) {
+      setError(addError.message || "Impossible d'ajouter la tâche.");
+    }
   };
 
   // Handler pour changer la recherche
@@ -107,10 +150,12 @@ export default function Home() {
     .sort((a, b) => {
       if (sortOrder === "priority") {
         // Ordonner par priorité ascendante ("haute" < "moyenne" < "basse")
-        return PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority];
+        const priorityA = PRIORITY_ORDER[a.priority] ?? Number.MAX_SAFE_INTEGER;
+        const priorityB = PRIORITY_ORDER[b.priority] ?? Number.MAX_SAFE_INTEGER;
+        return priorityA - priorityB;
       } else if (sortOrder === "date") {
         // Ordonner par date de création croissante (plus récent d'abord)
-        return b.createdAt - a.createdAt;
+        return getCreatedAtMs(b.createdAt) - getCreatedAtMs(a.createdAt);
       }
       return 0;
     });
@@ -125,6 +170,19 @@ export default function Home() {
 
           {/* Tableau de bord au-dessus de la barre de recherche */}
           <Dashboard tasks={tasks} />
+
+          {loading ? (
+            <p className="text-sm font-medium text-zinc-600">Chargement...</p>
+          ) : null}
+
+          {error ? (
+            <p
+              role="alert"
+              className="w-full rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700"
+            >
+              {error}
+            </p>
+          ) : null}
 
           {/* Barre de recherche, de filtre et tri - au dessus de la liste */}
           <div className="flex flex-col md:flex-row w-full items-center gap-4 mt-2">
@@ -156,7 +214,13 @@ export default function Home() {
           <AddTaskForm onAddTask={handleAddTask} />
 
           {/* Affichage du composant TaskList avec les handlers et les tâches filtrées */}
-          <TaskList tasks={filteredTasks} onToggle={handleToggle} onDelete={handleDelete} />
+          {!loading ? (
+            <TaskList
+              tasks={filteredTasks}
+              onToggle={handleToggle}
+              onDelete={handleDelete}
+            />
+          ) : null}
 
           <button
             className="mt-4 px-8 py-3 rounded-full bg-blue-600 text-white text-base font-semibold text-center hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
