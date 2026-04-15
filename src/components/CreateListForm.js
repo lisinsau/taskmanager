@@ -41,6 +41,7 @@ export default function CreateListForm({ onCreateList }) {
         placeholder="Nom de la liste"
         className="flex-1 rounded-lg border border-zinc-300 px-4 py-2"
         aria-invalid={Boolean(error)}
+        aria-describedby={error ? "create-list-error" : undefined}
         required
       />
       <button
@@ -52,7 +53,11 @@ export default function CreateListForm({ onCreateList }) {
       </button>
 
       {error ? (
-        <p role="alert" className="w-full text-sm text-red-600 sm:basis-full">
+        <p
+          id="create-list-error"
+          role="alert"
+          className="w-full text-sm text-red-600 sm:basis-full"
+        >
           {error}
         </p>
       ) : null}

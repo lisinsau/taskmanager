@@ -41,7 +41,7 @@ export async function getUserTasks(userId) {
         id: taskDoc.id,
         title: data.title ?? "",
         completed: data.completed ?? false,
-        priority: data.priority ?? "medium",
+        priority: data.priority ?? "moyenne",
         createdAt: data.createdAt ?? null,
       };
     });
@@ -53,9 +53,9 @@ export async function getUserTasks(userId) {
 export async function addTask(userId, task) {
   try {
     const payload = {
-      title: task?.title?.trim() || "",
+      title: task?.title?.trim() || "Titre par défaut",
       completed: false,
-      priority: task?.priority || "medium",
+      priority: task?.priority || "moyenne",
       createdAt: serverTimestamp(),
     };
 
@@ -97,7 +97,7 @@ export function subscribeToTasks(userId, callback, onError) {
             id: taskDoc.id,
             title: data.title ?? "",
             completed: data.completed ?? false,
-            priority: data.priority ?? "medium",
+            priority: data.priority ?? "moyenne",
             createdAt: data.createdAt ?? null,
           };
         });

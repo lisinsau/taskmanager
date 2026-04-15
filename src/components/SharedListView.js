@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import AddTaskForm from "./AddTaskForm";
 import TaskItem from "./TaskItem";
-
+import TaskStats from "./TaskStats";
 function MemberChip({ member, isOwner, canRemove, onRemove }) {
   const memberId = typeof member === "string" ? member : member?.id;
   const memberLabel =
@@ -15,7 +15,7 @@ function MemberChip({ member, isOwner, canRemove, onRemove }) {
         {memberLabel}
         {isOwner ? (
           <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">
-            Owner
+            Propriétaire
           </span>
         ) : null}
       </span>
@@ -80,9 +80,21 @@ export default function SharedListView({
           Retour
         </button>
       </header>
-
       <article className="space-y-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-        <h3 className="text-lg font-semibold text-zinc-900">Membres</h3>
+      <TaskStats tasks={tasks} /></article>
+      <article className="space-y-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+        <div className="flex items-center gap-3">
+          <span
+            className="material-symbols-outlined text-primary"
+            aria-hidden="true"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            group
+          </span>
+          <h3 className="text-xl font-semibold tracking-tight text-on-surface">
+            Membres
+          </h3>
+        </div>
 
         <ul className="space-y-2" aria-label="Liste des membres">
           {safeMembers.length === 0 ? (
@@ -127,8 +139,19 @@ export default function SharedListView({
         </form>
       </article>
 
-      <article className="space-y-4 rounded-xl border border-zinc-200 bg-white p-4">
-        <h3 className="text-lg font-semibold text-zinc-900">Tâches partagées</h3>
+      <article className="space-y-4 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+      <div className="flex items-center gap-3">
+          <span
+            className="material-symbols-outlined text-primary"
+            aria-hidden="true"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            folder_shared
+          </span>
+          <h3 className="text-xl font-semibold tracking-tight text-on-surface">
+            Tâches partagées
+          </h3>
+        </div>
 
         <AddTaskForm onAddTask={onAddTask} />
 

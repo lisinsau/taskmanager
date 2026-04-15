@@ -272,7 +272,7 @@ export async function getSharedListTasks(listId) {
 export async function addSharedTask(listId, userId, task) {
   try {
     const payload = {
-      title: task?.title?.trim() || "",
+      title: task?.title?.trim() || "Titre par défaut",
       completed: false,
       priority: task?.priority || "moyenne",
       createdAt: serverTimestamp(),

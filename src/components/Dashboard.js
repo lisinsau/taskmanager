@@ -5,7 +5,7 @@ import ProgressBar from "./ProgressBar";
 function Dashboard({ tasks }) {
   const safeTasks = Array.isArray(tasks) ? tasks : [];
   const totalTasks = safeTasks.length;
-  const completedTasks = tasks.filter((task) => task.completed).length;
+  const completedTasks = safeTasks.filter((task) => task.completed).length;
   const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
   return (
@@ -31,7 +31,7 @@ function Dashboard({ tasks }) {
         </article>
       ) : null}
 
-      <TaskStats tasks={tasks} />
+      <TaskStats tasks={safeTasks} />
 
       <article className="rounded-xl bg-surface-container-low">
         <ProgressBar percentage={progress} label="Progression globale" />
